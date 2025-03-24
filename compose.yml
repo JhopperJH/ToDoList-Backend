@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   mariadb:
     image: mariadb:latest
@@ -13,18 +11,27 @@ services:
       MARIADB_DATABASE: ToDo
       MARIADB_ROOT_PASSWORD: ToDosecret
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      start_period: 1m
+      start_interval: 10s
+      interval: 1m
+      timeout: 5s
       retries: 5
 
   todo-api:
     build: .
     container_name: todo-container
-    restart: always
     ports:
       - "5555:5555"
     environment:
-      - ConnectionStrings__DefaultConnection=Server=localhost;Database=ToDo;User=root;Password=ToDosecret;
+      DB_SERVER: mariadb
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: ToDosecret
+      DB_DATABASE: ToDo
+      JWT_KEY: 555544FinPenGamerTodDenTodAye555544
+      JWT_ISSUER: ToDo
+      JWT_AUDIENCE: public
     depends_on:
       mariadb:
         condition: service_healthy

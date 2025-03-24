@@ -11,7 +11,6 @@ RUN dotnet restore "ToDo.csproj"
 
 # Copy the rest of the source code
 COPY . .
-COPY .env .env
 
 # Build the application
 RUN dotnet build "ToDo.csproj" -c $BUILD_CONFIGURATION -o /app/build
@@ -26,6 +25,8 @@ EXPOSE 5555
 
 # Copy published application from build stage
 COPY --from=build /app/publish .
+
+COPY ./MariaDB.sql .
 
 # Run the application
 ENTRYPOINT ["dotnet", "ToDo.dll"]

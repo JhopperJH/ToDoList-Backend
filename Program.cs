@@ -111,4 +111,11 @@ app.UseAuthentication();           // Enable JWT Authentication
 app.UseAuthorization();            // Enable Authorization
 app.MapControllers();              // Map API Controllers
 
+using (var scope = app.Services.CreateScope())
+{
+    string rawSql = File.ReadAllText("./MariaDB.sql");
+    var dbContext = scope.ServiceProvider.GetRequiredService<ToDoDbContext>();
+    var result = dbContext.Database.ExecuteSqlRaw(rawSql);
+}
+
 app.Run();
