@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb11.8
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_USER: root
+      MARIADB_PASSWORD: secret
+      MARIADB_DATABASE: ToDo
+      MARIADB_ROOT_PASSWORD: ToDosecret
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+
+  todo-api:
+    build: .
+    container_name: todo-container
+    restart: always
+    ports:
+      - "5555:5555"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=localhost;Database=ToDo;User=root;Password=ToDosecret;
+    depends_on:
+      mariadb:
+        condition: service_healthy
